@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Shop</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif; /* Elegantere, modernere Schriftart */
+            background-color: #faf0e6; /* Warmer Hintergrund passend zu Cookies */
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #6b4226; /* Schokoladenfarben */
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        p {
+            font-size: 1.2rem;
+        }
+
+        .overview-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .cookie-overview {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .cookie-overview .cookie-card {
+            width: 150px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .cookie-overview .cookie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .cookie-overview img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .cookie-overview h3 {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #6b4226;
+        }
+
+        .swipe-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin: 40px;
+        }
+
+        .cookie-display {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            position: relative;
+        }
+
+        .cookie-display img {
+            width: 100%;
+            border-radius: 15px;
+        }
+
+        .cookie-display h3 {
+            margin: 15px 0;
+            font-size: 24px;
+            color: #6b4226;
+        }
+
+        .cookie-display p {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .price {
+            font-size: 20px;
+            color: #e67e22;
+            margin: 15px 0;
+        }
+
+        .buy-container {
+            margin-top: 20px;
+        }
+
+        .buy-button {
+            background-color: #ff6347; /* Tomato Red */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .buy-button:hover {
+            background-color: #e5533a;
+        }
+
+        .quantity-input {
+            width: 50px;
+            padding: 5px;
+            margin: 10px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        /* Arrow styles */
+        .arrow-left, .arrow-right {
+            font-size: 30px;
+            color: #333;
+            background-color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .arrow-left {
+            left: -25px; /* Pfeil näher an die Cookie-Anzeige gebracht */
+        }
+
+        .arrow-right {
+            right: -25px; /* Pfeil näher an die Cookie-Anzeige gebracht */
+        }
+
+        .arrow-left:hover, .arrow-right:hover {
+            background-color: #f4f4f4;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Cookie Shop</h1>
+        <p>Your favorite cookies just a click away!</p>
+    </div>
+
+    <!-- Cookie Overview -->
+    <div class="overview-container">
+        <h2>Our Delicious Cookies</h2>
+        <div class="cookie-overview">
+            <div class="cookie-card" onclick="openCookie(0)">
+                <img src="cookie1.jpg" alt="Chocoa Chaos">
+                <h3>Chocoa Chaos</h3>
+            </div>
+            <div class="cookie-card" onclick="openCookie(1)">
+                <img src="cookie2.jpg" alt="Cookie Monster">
+                <h3>Cookie Monster</h3>
+            </div>
+            <div class="cookie-card" onclick="openCookie(2)">
+                <img src="cookie3.jpg" alt="Matcha Munchies">
+                <h3>Matcha Munchies</h3>
+            </div>
+            <div class="cookie-card" onclick="openCookie(3)">
+                <img src="cookie4.jpg" alt="The Original">
+                <h3>The Original</h3>
+            </div>
+            <div class="cookie-card" onclick="openCookie(4)">
+                <img src="cookie5.jpg" alt="Reddy or Not">
+                <h3>Reddy or Not</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swipe Container for selected cookie -->
+    <div id="cookie-swipe" class="swipe-container" style="display: none;">
+        <button class="arrow-left" onclick="previousCookie()">&#8592;</button>
+
+        <div class="cookie-display" id="cookie-display">
+            <img id="cookie-image" src="" alt="Cookie Image">
+            <h3 id="cookie-name"></h3>
+            <p id="cookie-description"></p>
+            <div class="price" id="cookie-price"></div>
+
+            <div class="buy-container">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" class="quantity-input" value="1" min="1">
+                <button class="buy-button" onclick="goToCheckout()">Buy Now</button>
+            </div>
+        </div>
+
+        <button class="arrow-right" onclick="nextCookie()">&#8594;</button>
+    </div>
+
+    <script>
+        const cookies = [
+            {
+                name: "Chocoa Chaos",
+                description: "Dark chocolate with dark whip cream",
+                price: "$4.99",
+                imgSrc: "cookie1.jpg"
+            },
+            {
+                name: "Cookie Monster",
+                description: "Original dough cookie, less sweet with blue outside",
+                price: "$5.99",
+                imgSrc: "cookie2.jpg"
+            },
+            {
+                name: "Matcha Munchies",
+                description: "Matcha dough with cream cheese filling",
+                price: "$4.50",
+                imgSrc: "cookie3.jpg"
+            },
+            {
+                name: "The Original",
+                description: "Original dough with chocochip and sea salt",
+                price: "$4.75",
+                imgSrc: "cookie4.jpg"
+            },
+            {
+                name: "Reddy or Not",
+                description: "Red velvet dough with cheese and Oreo crumble",
+                price: "$5.25",
+                imgSrc: "cookie5.jpg"
+            }
+        ];
+
+        let currentCookieIndex = 0;
+
+        function openCookie(index) {
+            currentCookieIndex = index;
+            showCookie();
+            document.querySelector('.overview-container').style.display = 'none';
+            document.getElementById('cookie-swipe').style.display = 'flex';
+        }
+
+        function showCookie() {
+            const cookie = cookies[currentCookieIndex];
+            document.getElementById('cookie-image').src = cookie.imgSrc;
+            document.getElementById('cookie-name').innerText = cookie.name;
+            document.getElementById('cookie-description').innerText = cookie.description;
+            document.getElementById('cookie-price').innerText = cookie.price;
+        }
+
+        function previousCookie() {
+            if (currentCookieIndex > 0) {
+                currentCookieIndex--;
+            } else {
+                currentCookieIndex = cookies.length - 1;
+            }
+            showCookie();
+        }
+
+        function nextCookie() {
+            if (currentCookieIndex < cookies.length - 1) {
+                currentCookieIndex++;
+            } else {
+                currentCookieIndex = 0;
+            }
+            showCookie();
+        }
+
+        function goToCheckout() {
+            alert("Proceeding to checkout...");
+        }
+    </script>
+
+</body>
+</html>
