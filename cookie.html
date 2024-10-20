@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cookie Shop</title>
     <style>
+        /* Der bestehende Style bleibt unverändert */
         body {
-            font-family: 'Poppins', sans-serif; /* Elegantere, modernere Schriftart */
-            background-color: #faf0e6; /* Warmer Hintergrund passend zu Cookies */
+            font-family: 'Poppins', sans-serif;
+            background-color: #faf0e6;
             color: #333;
             margin: 0;
             padding: 0;
         }
 
         .header {
-            background-color: #6b4226; /* Schokoladenfarben */
+            background-color: #6b4226;
             padding: 20px;
             text-align: center;
             color: white;
@@ -112,7 +113,7 @@
         }
 
         .buy-button {
-            background-color: #ff6347; /* Tomato Red */
+            background-color: #ff6347;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -150,15 +151,60 @@
         }
 
         .arrow-left {
-            left: -25px; /* Pfeil näher an die Cookie-Anzeige gebracht */
+            left: -25px;
         }
 
         .arrow-right {
-            right: -25px; /* Pfeil näher an die Cookie-Anzeige gebracht */
+            right: -25px;
         }
 
         .arrow-left:hover, .arrow-right:hover {
             background-color: #f4f4f4;
+        }
+
+        /* Styles for the cart and checkout */
+        .cart-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .cart-item img {
+            width: 50px;
+            border-radius: 5px;
+        }
+
+        .cart-item h4 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .cart-item p {
+            margin: 0;
+        }
+
+        .checkout-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .checkout-button:hover {
+            background-color: #218838;
         }
 
     </style>
@@ -210,12 +256,19 @@
 
             <div class="buy-container">
                 <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" class="quantity-input" value="1" min="1">
-                <button class="buy-button" onclick="goToCheckout()">Buy Now</button>
+                <input type="number" id="quantity" class="quantity-input" value="1" min="1" oninput="updatePrice()">
+                <button class="buy-button" onclick="addToCart()">Buy Now</button>
             </div>
         </div>
 
         <button class="arrow-right" onclick="nextCookie()">&#8594;</button>
+    </div>
+
+    <!-- Cart and Checkout -->
+    <div id="cart" class="cart-container" style="display: none;">
+        <h2>Your Cart</h2>
+        <div id="cart-items"></div>
+        <button class="checkout-button" onclick="goToPayPal()">Checkout</button>
     </div>
 
     <script>
@@ -223,36 +276,37 @@
             {
                 name: "Chocoa Chaos",
                 description: "Dark chocolate with dark whip cream",
-                price: "12k",
+                price: 12000,
                 imgSrc: "cookie5.jpg"
             },
             {
                 name: "Cookie Monster",
                 description: "Original dough cookie, less sweet with blue outside",
-                price: "18k",
+                price: 18000,
                 imgSrc: "cookie1.jpg"
             },
             {
                 name: "Matcha Munchies",
                 description: "Matcha dough with cream cheese filling",
-                price: "14k",
+                price: 14000,
                 imgSrc: "cookie2.jpg"
             },
             {
                 name: "The Original",
                 description: "Original dough with chocochip and sea salt",
-                price: "10k",
+                price: 10000,
                 imgSrc: "cookie3.jpg"
             },
             {
                 name: "Reddy or Not",
                 description: "Red velvet dough with cheese and Oreo crumble",
-                price: "16k",
+                price: 16000,
                 imgSrc: "cookie4.jpg"
             }
         ];
 
         let currentCookieIndex = 0;
+        let cart = [];
 
         function openCookie(index) {
             currentCookieIndex = index;
@@ -266,7 +320,7 @@
             document.getElementById('cookie-image').src = cookie.imgSrc;
             document.getElementById('cookie-name').innerText = cookie.name;
             document.getElementById('cookie-description').innerText = cookie.description;
-            document.getElementById('cookie-price').innerText = cookie.price;
+            document.getElementById('cookie-price').innerText = `${cookie.price} IDR`;
         }
 
         function previousCookie() {
@@ -287,8 +341,56 @@
             showCookie();
         }
 
-        function goToCheckout() {
-            alert("Proceeding to checkout...");
+        function updatePrice() {
+            const quantity = document.getElementById('quantity').value;
+            const cookie = cookies[currentCookieIndex];
+            const total = quantity * cookie.price;
+            document.getElementById('cookie-price').innerText = `${total} IDR`;
+        }
+
+        function addToCart() {
+            const quantity = document.getElementById('quantity').value;
+            const cookie = cookies[currentCookieIndex];
+            cart.push({
+                ...cookie,
+                quantity: quantity
+            });
+            alert(`${cookie.name} added to cart!`);
+            showCart();
+        }
+
+        function showCart() {
+            document.getElementById('cookie-swipe').style.display = 'none';
+            document.getElementById('cart').style.display = 'block';
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+            let totalPrice = 0;
+
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+                cartItem.innerHTML = `
+                    <img src="${item.imgSrc}" alt="${item.name}">
+                    <h4>${item.name}</h4>
+                    <p>Quantity: ${item.quantity}</p>
+                    <p>Total: ${item.quantity * item.price} IDR</p>
+                `;
+                totalPrice += item.quantity * item.price;
+                cartItems.appendChild(cartItem);
+            });
+
+            const total = document.createElement('div');
+            total.innerHTML = `<h3>Total Price: ${totalPrice} IDR</h3>`;
+            cartItems.appendChild(total);
+        }
+
+        function goToPayPal() {
+            let totalPrice = 0;
+            cart.forEach(item => {
+                totalPrice += item.quantity * item.price;
+            });
+            const paypalLink = `https://paypal.me/AliMakki10/${totalPrice}`;
+            window.location.href = paypalLink;
         }
     </script>
 
