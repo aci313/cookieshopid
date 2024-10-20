@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cookie Shop</title>
     <style>
-        /* Der bestehende Style bleibt unverändert */
+        /* Styles for the page */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #faf0e6;
@@ -193,6 +193,14 @@
             margin: 0;
         }
 
+        .remove-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: red;
+            font-size: 20px;
+        }
+
         .checkout-button {
             background-color: #28a745;
             color: white;
@@ -206,7 +214,6 @@
         .checkout-button:hover {
             background-color: #218838;
         }
-
     </style>
 </head>
 <body>
@@ -221,21 +228,21 @@
     <div class="overview-container">
         <h2>Our Delicious Cookies</h2>
         <div class="cookie-overview">
-            <div class="cookie-card" onclick="openCookie(0)">
-                <img src="cookie5.jpg" alt="Chocoa Chaos">
-                <h3>Chocoa Chaos</h3>
+            <div class="cookie-card" onclick="openCookie(0)"> <!-- Chocoa Chaos -->
+                <img src="cookie3.jpg" alt="The Original">
+                <h3>The Original</h3>
             </div>
             <div class="cookie-card" onclick="openCookie(1)">
-                <img src="cookie1.jpg" alt="Cookie Monster">
-                <h3>Cookie Monster</h3>
+                <img src="cookie5.jpg" alt="Chocoa Chaos">
+                <h3>Chocoa Chaos</h3>
             </div>
             <div class="cookie-card" onclick="openCookie(2)">
                 <img src="cookie2.jpg" alt="Matcha Munchies">
                 <h3>Matcha Munchies</h3>
             </div>
             <div class="cookie-card" onclick="openCookie(3)">
-                <img src="cookie3.jpg" alt="The Original">
-                <h3>The Original</h3>
+                <img src="cookie1.jpg" alt="Cookie Monster">
+                <h3>Cookie Monster</h3>
             </div>
             <div class="cookie-card" onclick="openCookie(4)">
                 <img src="cookie4.jpg" alt="Reddy or Not">
@@ -257,7 +264,7 @@
             <div class="buy-container">
                 <label for="quantity">Quantity:</label>
                 <input type="number" id="quantity" class="quantity-input" value="1" min="1" oninput="updatePrice()">
-                <button class="buy-button" onclick="addToCart()">Buy Now</button>
+                <button class="buy-button" onclick="addToCart()">Add to Cart</button>
             </div>
         </div>
 
@@ -274,16 +281,16 @@
     <script>
         const cookies = [
             {
-                name: "Chocoa Chaos",
-                description: "Dark chocolate with dark whip cream",
-                price: 12000,
-                imgSrc: "cookie5.jpg"
+                name: "The Original",
+                description: "Original dough with chocochip and sea salt on top",
+                price: 10000,
+                imgSrc: "cookie3.jpg"
             },
             {
-                name: "Cookie Monster",
-                description: "Original dough cookie, less sweet with blue outside",
-                price: 18000,
-                imgSrc: "cookie1.jpg"
+                name: "Chocoa Chaos",
+                description: "Dark chocolate with dark choco whip cream",
+                price: 12000,
+                imgSrc: "cookie5.jpg"
             },
             {
                 name: "Matcha Munchies",
@@ -292,14 +299,14 @@
                 imgSrc: "cookie2.jpg"
             },
             {
-                name: "The Original",
-                description: "Original dough with chocochip and sea salt",
-                price: 10000,
-                imgSrc: "cookie3.jpg"
+                name: "Cookie Monster",
+                description: "Original dough cookie inside, less sweet with blue outside",
+                price: 18000,
+                imgSrc: "cookie1.jpg"
             },
             {
                 name: "Reddy or Not",
-                description: "Red velvet dough with cheese and Oreo crumble",
+                description: "Red velvet dough with cream cheese on top plus oreo crumble",
                 price: 16000,
                 imgSrc: "cookie4.jpg"
             }
@@ -321,6 +328,7 @@
             document.getElementById('cookie-name').innerText = cookie.name;
             document.getElementById('cookie-description').innerText = cookie.description;
             document.getElementById('cookie-price').innerText = `${cookie.price} IDR`;
+            document.getElementById('quantity').value = 1; // Reset quantity to 1 when showing a new cookie
         }
 
         function previousCookie() {
@@ -351,22 +359,27 @@
         function addToCart() {
             const quantity = document.getElementById('quantity').value;
             const cookie = cookies[currentCookieIndex];
-            cart.push({
-                ...cookie,
-                quantity: quantity
-            });
-            alert(`${cookie.name} added to cart!`);
-            showCart();
+            const existingItem = cart.find(item => item.name === cookie.name);
+
+            if (existingItem) {
+                existingItem.quantity = parseInt(existingItem.quantity) + parseInt(quantity); // Update quantity
+            } else {
+                cart.push({
+                    ...cookie,
+                    quantity: quantity
+                });
+            }
+            alert(`${cookie.name} has been added to your cart!`);
+            showCart(); // Show cart after adding
         }
 
         function showCart() {
-            document.getElementById('cookie-swipe').style.display = 'none';
             document.getElementById('cart').style.display = 'block';
             const cartItems = document.getElementById('cart-items');
             cartItems.innerHTML = '';
             let totalPrice = 0;
 
-            cart.forEach(item => {
+            cart.forEach((item, index) => {
                 const cartItem = document.createElement('div');
                 cartItem.classList.add('cart-item');
                 cartItem.innerHTML = `
@@ -374,6 +387,7 @@
                     <h4>${item.name}</h4>
                     <p>Quantity: ${item.quantity}</p>
                     <p>Total: ${item.quantity * item.price} IDR</p>
+                    <button class="remove-button" onclick="removeFromCart(${index})">&times;</button>
                 `;
                 totalPrice += item.quantity * item.price;
                 cartItems.appendChild(cartItem);
@@ -382,6 +396,11 @@
             const total = document.createElement('div');
             total.innerHTML = `<h3>Total Price: ${totalPrice} IDR</h3>`;
             cartItems.appendChild(total);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            showCart(); // Update cart after removal
         }
 
         function goToPayPal() {
@@ -396,3 +415,4 @@
 
 </body>
 </html>
+
